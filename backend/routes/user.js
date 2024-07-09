@@ -4,11 +4,11 @@ dotenv.config();
 const router = express.Router();
 const zod = require('zod');
 const mongoose = require('mongoose');
-const { User } = require('../db');
+const { User } = require('../db/db');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
 const { authMiddleware } = require('../middlewares/middlewares');
-const { signinSchema,signupSchema,updateBodySchema } = require('./zod/schemas');
+const { signinSchema,signupSchema,updateBodySchema } = require('./zod/user');
 
 
 router.post('/signup',async (req,res) => {
@@ -101,8 +101,28 @@ router.put('/',authMiddleware,async (req,res) => {
   })
 })
 
-router.get('/bulk',(req,res) => {
+router.get('/bulk',async(req,res) => {
   const filter = req.params.filter || "";
+  const users = await User.find({
+    $or:[
+      {
+        firstname: {
+         $regex:filter 
+        },lastname:{
+          $regex:filter
+        }
+      }
+    ]
+  })
+
+  res.status(200).json({
+    user: users.map(user => ({
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id
+    }))
+  })
   
 })
 
