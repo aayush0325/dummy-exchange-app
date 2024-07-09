@@ -7,19 +7,9 @@ const mongoose = require('mongoose');
 const { User } = require('../db');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
-const { authMiddleware } = require('../middlewares');
+const { authMiddleware } = require('../middlewares/middlewares');
+const { signinSchema,signupSchema,updateBodySchema } = require('./zod/schemas');
 
-const signupSchema = zod.object({
-  firstname:zod.string().min(3).max(50),
-  lastname: zod.string().min(3).max(50),
-  username: zod.string().min(3).max(50),
-  password: zod.string().min(3).max(50),
-})
-
-const signinSchema = zod.object({
-  firstname:zod.string().min(3).max(50),
-  lastname: zod.string().min(3).max(50),
-})
 
 router.post('/signup',async (req,res) => {
   const success = signupSchema.safeParse(req.body).success;
@@ -85,12 +75,6 @@ router.post('/signin',async (req,res) => {
     token,
   })
 
-})
-
-const updateBodySchema = zod.object({
-  firstname:zod.string().min(3).max(50).optional(),
-  password:zod.string().min(3).max(50).optional(),
-  lastname:zod.string().min(3).max(50).optional(),
 })
 
 router.put('/',authMiddleware,async (req,res) => {
