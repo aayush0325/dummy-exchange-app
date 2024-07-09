@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const { User } = require('../db');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
+const { authMiddleware } = require('../middlewares');
 
 const signupSchema = zod.object({
   firstname:zod.string().min(3).max(50),
@@ -85,6 +86,42 @@ router.post('/signin',async (req,res) => {
   })
 
 })
+
+const updateBodySchema = zod.object({
+  firstname:zod.string().min(3).max(50).optional(),
+  password:zod.string().min(3).max(50).optional(),
+  lastname:zod.string().min(3).max(50).optional(),
+})
+
+router.put('/',authMiddleware,async (req,res) => {
+  const success = updateBodySchema.safeParse(req.body).success;
+  if(!success){
+    return res.status(411).json({
+      msg:"Invalid inputs"
+    })
+  }
+
+  const findUser = await User.findById({
+    _id:req.userID,
+  });
+
+  if(!findUser){
+    return res.status(411).json({
+      msg:"User not found",
+    })
+  }
+  
+  await User.findByIdAndUpdate({_id:req.userID},req.body);
+  return res.status(200).json({
+    msg:'Updated Successfully!!!'
+  })
+})
+
+router.get('/bulk',(req,res) => {
+  const filter = req.params.filter || "";
+  
+})
+
 module.exports = router;
 
 
