@@ -1,11 +1,11 @@
 const zod = require('zod');
 
 
-const transferSchema = zod.obect({
+const transferSchema = zod.object({
   to: zod.string().min(3),
   amount: zod.number(),
 })
 
-module.exports = {
+module.exports= {
   transferSchema,
 }

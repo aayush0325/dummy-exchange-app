@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 
-router.get('/balance',authMiddleware,(req,res) => {
+router.get('/balance',authMiddleware,async(req,res) => {
   const account = await Accounts.findOne({
     userID:req.userID,
   });
@@ -19,18 +19,18 @@ router.get('/balance',authMiddleware,(req,res) => {
   });
 })
 
-router.post('/transfer',authMiddleware,(req,res) => {
+router.post('/transfer',authMiddleware,async(req,res) => {
   const {success} =  transfersSchema.safeParse(req.body);
   if(!success){
     return res.status(411).json({
-      msg: "Invalid inputs";
+      msg: "Invalid inputs"
     });
   };
 
   transferFunds(req.userID,req.body.to,req.body.amount);
 })
 
-async function transferFunds = (senderID,receiverID,amount) => {
+transferFunds = async (senderID,receiverID,amount) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try{
@@ -76,6 +76,4 @@ async function transferFunds = (senderID,receiverID,amount) => {
 
 
 
-module.exports = {
-  router
-}
+module.exports = router

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const { number } = require('zod');
+const zod = require('zod');
 dotenv.config();
 const MONGO_URI = process.env.MONGO_URI;
 
