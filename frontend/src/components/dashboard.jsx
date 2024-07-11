@@ -52,7 +52,7 @@ export function Dashboard(){
             <TopBar firstname={firstname}/>
             <Balance balance={balance}/>
             <Search filter={filter} setFilter={setFilter}/>
-            <User/>
+            <Users users={users}/>
         </div>
     )
 }
@@ -122,19 +122,28 @@ function Search({filter,setFilter}){
     )   
 }
 
-function User(){
+function Users({users}){
+    return <div>
+        {users.map(user => <User firstname={user.firstname} lastname={user.lastname} id={user._id}/>)}
+    </div>
+}
+
+function User({firstname,lastname,id}){
+    const navigate = useNavigate();
     return (
-        <div className="flex justify-between border shadow-md">
-            <div className="flex items-center border">
+        <div className="flex justify-between border shadow-md mx-7 my-3 p-4">
+            <div className="flex items-center">
                 <div className="bg-blue-500 text-white w-8 h-8 text-center mx-1 rounded-full flex items-center justify-center md:mx-2 md:w-10 md:h-10">
-                    U
+                    {firstname[0]}
                 </div>
                 <div className="text-xl ml-4">
-                    User
+                    {firstname} {lastname}
                 </div>
             </div>
             <div className="flex justify-end">
-                <Button variant="contained">Send Money</Button>
+                <Button variant="contained" onClick={() => {
+                    navigate(`/send?id=${id}&first=${firstname}&last=${lastname}`);
+                }}>Send Money</Button>
             </div>
         </div>
     )
