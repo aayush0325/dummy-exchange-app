@@ -1,10 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const {Accounts} = require('../db/db');
-const {User} = require('../db/db');
 const {authMiddleware} = require('../middlewares/middlewares')
 const {transferSchema} = require('./zod/accounts')
-
 
 const router = express.Router();
 
@@ -35,7 +33,7 @@ router.post('/transfer',authMiddleware,async(req,res) => {
   if (!account || account.balance < amount) {
       await session.abortTransaction();
       return res.status(400).json({
-          message: "Insufficient balance"
+          msg: "Insufficient balance"
       });
   }
 
@@ -44,15 +42,14 @@ router.post('/transfer',authMiddleware,async(req,res) => {
   if (!toAccount) {
       await session.abortTransaction();
       return res.status(400).json({
-          message: "Invalid account"
+          msg: "Invalid account"
       });
   }
 
-  // Perform the transfer
-  await Accounts.updateOne({ userId: req.userID }, { $inc: { balance: -amount } }).session(session);
-  await Accounts.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
 
-  // Commit the transaction
+  await Accounts.updateOne({ userID: req.userID }, { $inc: { balance: -amount } }).session(session);
+  await Accounts.updateOne({ userID: to }, { $inc: { balance: amount } }).session(session);
+
   await session.commitTransaction();
   res.json({
       message: "Transfer successful"

@@ -43,7 +43,6 @@ export function Dashboard(){
         }).then(
             (res) => {
                 setUsers(res.data.user);
-                console.log(users)
             }
         )
     },[filter])
