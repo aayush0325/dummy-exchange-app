@@ -43,12 +43,14 @@ transferFunds = async (senderID,receiverID,amount) => {
     });
 
     if(!sender || !receiver){
+      await session.abortTransaction();
       return res.status(403).json({
         msg:'Account not found',
       });
     };
 
     if(amount > sender.balance){
+      await session.abortTransaction();
       return res.json({
         msg:"Insufficient Funds",
       });
@@ -68,6 +70,8 @@ transferFunds = async (senderID,receiverID,amount) => {
     })
 
   }catch(err){
+    await session.abortTransaction();
+    session.endSession();
     return res.json({
       msg:"Some error in the database",
     })
