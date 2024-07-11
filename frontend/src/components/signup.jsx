@@ -81,8 +81,6 @@ export function InputBox({ heading, onChange,password }) {
     }
 }
 
-
-
 export function Warning(){
     return (
         <div className="bg-red-600 text-white mt-3 rounded p-3">
