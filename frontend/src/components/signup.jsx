@@ -2,6 +2,7 @@ import { TextField,Button } from "@mui/material"
 import { BottomWarning } from "./bottomwarning"
 import axios from "axios"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -18,22 +19,23 @@ export function Signup(){
     }else{
         component = null
     }
+    const navigate = useNavigate();
 
     return (
         <div className="flex justify-center items-center h-screen bg-slate-400">
             <div className='w-full max-w-xs text-center'>
                 <div className='flex flex-col justify-center bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4 border'>
                     <div className='text-4xl font-bold mb-4'>Sign Up</div>
-                    <InputBox heading={"First Name"} onChange={(e) => {
+                    <InputBox password={false} heading={"First Name"} onChange={(e) => {
                         setFirstname(e.target.value);
                     }}/>
-                    <InputBox heading={"Last Name"} onChange={(e) => {
+                    <InputBox password={false} heading={"Last Name"} onChange={(e) => {
                         setLastname(e.target.value)
                     }}/>
-                    <InputBox heading={"Username"} onChange={(e) => {
+                    <InputBox password={false} heading={"Username"} onChange={(e) => {
                         setUsername(e.target.value)
                     }}/>
-                    <InputBox heading={"Password"} onChange={(e) => {
+                    <InputBox password={true} heading={"Password"} onChange={(e) => {
                         setPassword(e.target.value)
                     }}/>
                     <div className='flex justify-center'>
@@ -48,7 +50,8 @@ export function Signup(){
                                 firstname,
                                 lastname, 
                             })
-                            localStorage.setItem("token", response.data.token )
+                            localStorage.setItem("token", response.data.token);
+                            navigate('/dashboard');
                         }
                     }}>Sign Up</Button>
                     </div>
@@ -60,17 +63,27 @@ export function Signup(){
     )
 }
 
-export function InputBox({heading,onChange}){
-    return (
-        <div className='mb-2 flex justify-center flex-col'>
-        <div className='text-lg font-semibold mb-2'>{heading}</div>
-        <TextField id='outlined-basic' label={heading} variant='outlined' onChange={onChange}/>
-        </div>
-    )
+export function InputBox({ heading, onChange,password }) {
+    if(password){
+        return (
+            <div className='mb-2 flex justify-center flex-col'>
+                <div className='text-lg font-semibold mb-2'>{heading}</div>
+                <TextField id='outlined-basic' label={heading} variant='outlined' onChange={onChange} type="password"/>
+            </div>
+        );
+    }else{
+        return (
+            <div className='mb-2 flex justify-center flex-col'>
+                <div className='text-lg font-semibold mb-2'>{heading}</div>
+                <TextField id='outlined-basic' label={heading} variant='outlined' onChange={onChange} />
+            </div>
+        );
+    }
 }
 
 
-function Warning(){
+
+export function Warning(){
     return (
         <div className="bg-red-600 text-white mt-3 rounded p-3">
             All fields should be more than 3 characters and less than 50 characters

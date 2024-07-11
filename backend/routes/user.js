@@ -60,8 +60,9 @@ router.post('/signin',async (req,res) => {
     })
   }
 
-  const existingUser = User.findOne({
+  const existingUser = await User.findOne({
     username:req.body.username,
+    password:req.body.password,
   })
 
   if(!existingUser){
@@ -77,9 +78,15 @@ router.post('/signin',async (req,res) => {
   return res.status(200).json({
     token,
   })
-
 })
 
+router.get('/info',authMiddleware,async(req,res) => {
+  const account = await User.findById(req.userID)
+  return res.json({
+    firstname: account.firstname,
+    lastname: account.lastname,
+  })
+})
 
 router.get('/bulk',authMiddleware,async(req,res) => {
   const filter = req.query.filter || "";

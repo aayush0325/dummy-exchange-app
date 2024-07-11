@@ -37,9 +37,7 @@ response - array of users with similar name
 api/v1/account/balance - GET request
 
 send auth headers too
- 
-
- returns balance of a user
+returns balance of a user
 
 5.
 
@@ -52,3 +50,9 @@ body - {
     amount: number to be transfered
 }
 
+
+6. api/v1/user/info - GET request
+
+send auth tokens
+
+sends back firstname and lastname
