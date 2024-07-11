@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { Appbar } from "./appbar";
 import { Balance } from "./balance";
 import { Users } from "./users";
+import axios from "axios";
 
 export function Dashboard({user}){
     return (
