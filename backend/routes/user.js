@@ -80,43 +80,20 @@ router.post('/signin',async (req,res) => {
 
 })
 
-router.put('/',authMiddleware,async (req,res) => {
-  const success = updateBodySchema.safeParse(req.body).success;
-  if(!success){
-    return res.status(411).json({
-      msg:"Invalid inputs"
-    })
-  }
 
-  const findUser = await User.findById({
-    _id:req.userID,
-  });
+router.get('/bulk',authMiddleware,async(req,res) => {
+  const filter = req.query.filter || "";
 
-  if(!findUser){
-    return res.status(411).json({
-      msg:"User not found",
-    })
-  }
-  await User.updateOne(req.body, {
-    id: req.userId
-  })
-  return res.status(200).json({
-    msg:'Updated Successfully!!!'
-  })
-})
-
-router.get('/bulk',async(req,res) => {
-  const filter = req.query .filter || "";
   const users = await User.find({
-    $or:[
-      {
-        firstname: {
-         $regex:filter 
-        },lastname:{
-          $regex:filter
-        }
-      }
-    ]
+      $or: [{
+          firstname: {
+              "$regex": filter
+          }
+      }, {
+          lastname: {
+              "$regex": filter
+          }
+      }]
   })
 
   res.status(200).json({

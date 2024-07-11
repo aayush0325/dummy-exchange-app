@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const {Accounts} = require('../db/db');
 const {User} = require('../db/db');
 const {authMiddleware} = require('../middlewares/middlewares')
-const {transfersSchema} = require('./zod/accounts')
+const {transferSchema} = require('./zod/accounts')
 
 
 const router = express.Router();
@@ -20,63 +20,44 @@ router.get('/balance',authMiddleware,async(req,res) => {
 })
 
 router.post('/transfer',authMiddleware,async(req,res) => {
-  const {success} =  transfersSchema.safeParse(req.body);
+  const success =  transferSchema.safeParse(req.body).success;
   if(!success){
     return res.status(411).json({
       msg: "Invalid inputs"
     });
   };
-
-  transferFunds(req.userID,req.body.to,req.body.amount);
-})
-
-transferFunds = async (senderID,receiverID,amount) => {
   const session = await mongoose.startSession();
+
   session.startTransaction();
-  try{
-    const sender = await Accounts.findOne({
-      userID: senderID,
-    });
+  const { amount, to } = req.body;
+  const account = await Accounts.findOne({ userID: req.userID }).session(session);
 
-    const receiver = await Accounts.findOne({
-      userID: receiverID,
-    });
-
-    if(!sender || !receiver){
+  if (!account || account.balance < amount) {
       await session.abortTransaction();
-      return res.status(403).json({
-        msg:'Account not found',
+      return res.status(400).json({
+          message: "Insufficient balance"
       });
-    };
-
-    if(amount > sender.balance){
-      await session.abortTransaction();
-      return res.json({
-        msg:"Insufficient Funds",
-      });
-    }
-    
-    sender.balance-=amount;
-    receiver.balance+=amount;
-
-    await sender.save({session});
-    await receiver.save({session});
-
-    await session.commitTransaction();
-    await session.endSession();
-
-    return res.json({
-      msg:"Transfer successful!!!"
-    })
-
-  }catch(err){
-    await session.abortTransaction();
-    session.endSession();
-    return res.json({
-      msg:"Some error in the database",
-    })
   }
-}
+
+  const toAccount = await Accounts.findOne({ userID: to }).session(session);
+
+  if (!toAccount) {
+      await session.abortTransaction();
+      return res.status(400).json({
+          message: "Invalid account"
+      });
+  }
+
+  // Perform the transfer
+  await Accounts.updateOne({ userId: req.userID }, { $inc: { balance: -amount } }).session(session);
+  await Accounts.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
+
+  // Commit the transaction
+  await session.commitTransaction();
+  res.json({
+      message: "Transfer successful"
+  });
+})
 
 
 

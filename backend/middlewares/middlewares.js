@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = require('../config');
+const {JWT_SECRET} = require('../config');
+const { User } = require('../db/db');
 
-function authMiddleware(req,res,next){
+async function authMiddleware(req,res,next){
   const authHeader = req.headers.authorization;
-  if(!authHeader || !authHeader.beginsWith('Bearer')){
+  if(!authHeader || !authHeader[0] === "Bearer"){
     return res.status(411).json({
       msg:"Invalid headers"
     })
@@ -13,8 +14,15 @@ function authMiddleware(req,res,next){
 
   try{
     const decoded = jwt.decode(token,JWT_SECRET);
-    req.userID = decoded.userID;
-    next();
+    const checkUser = await User.findById(decoded.userID)
+    if(checkUser){
+      req.userID = decoded.userID;
+      next();
+    }else{
+      return res.status(411).json({
+        msg:"you dont have access"
+      })
+    }
   }catch(err){
     return res.status(403).json({
       msg:`${err.message}`
