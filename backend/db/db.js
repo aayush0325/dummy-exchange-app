@@ -11,47 +11,47 @@ mongoose.connect(MONGO_URI).then(
 )
 
 const userSchema = new mongoose.Schema({
-  firstname:{
-    type:String,
-    required:true,
-    minLength:3,
-    maxLength:50,
+  firstname: {
+    type: String,
+    required: true,
+    minLength: 3,
+    maxLength: 50,
   },
-  lastname:{
-    type:String,
-    required:true,
-    minLength:3,
-    maxLength:50,
+  lastname: {
+    type: String,
+    required: true,
+    minLength: 3,
+    maxLength: 50,
   },
-  username:{
-    type:String,
-    required:true,
-    minLength:3,
-    maxLength:50,
-    unique:true,
+  username: {
+    type: String,
+    required: true,
+    minLength: 3,
+    maxLength: 50,
+    unique: true,
   },
-  password:{ 
-    type:String,
-    required:true,
-    minLength:3,
-    maxLength:50,
+  password: {
+    type: String,
+    required: true,
+    minLength: 3,
+    maxLength: 50,
   }
 });
 
 const accountsSchema = new mongoose.Schema({
-  userID:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'User',
-    required:true,
+  userID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-  balance:{
-    type:Number,
-    required:true,
+  balance: {
+    type: Number,
+    required: true,
   }
 })
 
-const User = mongoose.model('User',userSchema);
-const Accounts = mongoose.model('Accounts',accountsSchema)
+const User = mongoose.model('User', userSchema);
+const Accounts = mongoose.model('Accounts', accountsSchema)
 
 module.exports = {
   User,
